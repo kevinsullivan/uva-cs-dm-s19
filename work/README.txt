@@ -1,0 +1,1 @@
+This directory is where you can put files that will be ignored by git, such as homework or scratch Lean files.
