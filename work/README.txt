@@ -1,1 +1,1 @@
-This directory is where you can put files that will be ignored by git, such as homework or scratch Lean files.
+Copy files from other directories into this work directory before you edit them. Do not make any changes to files in the src, hw, or exams directory. If you do then when you use "git pull" you will likely encounter conflicts. In that case, copy your changed files to this work directory, then use "git stash" to store the changes you've made to our files in a "stash." Then "git pull" should work.
