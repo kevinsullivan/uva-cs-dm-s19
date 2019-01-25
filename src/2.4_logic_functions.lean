@@ -2,6 +2,43 @@
 Copyright 2019 Kevin Sullivan and Ben Hocking. 
 -/
 
+namespace Functions.ex0
+axioms S T : Type
+def single_valued := ∀ f : S → T, 
+    ∀ x : S, ∀ y z : T,
+        f x = y ∧ f x = z → y = z
+end Functions.ex0
+
+namespace Functions.ex1
+axioms S T : Type
+def total := ∀ f : S → T, 
+    ∀ x : S, ∃ y : T, f x = y
+end Functions.ex1
+
+namespace Functions.ex2
+axioms S T : Type
+def strictly_partial := ∀ f : S → T, 
+    ∃ x : S, ¬ ∃ y : T, f x = y
+end Functions.ex2
+
+namespace Functions.ex3
+axioms S T : Type
+def surjective := ∀ f : S → T, 
+    ∀ y : T, ∃ x : S, f x = y
+end Functions.ex3
+
+namespace Functions.ex4
+axioms S T : Type
+def injective := ∀ f : S → T, 
+    ∀ x y : S, ∀ z : T,
+        f x = z ∧ f y = z → x = y
+end Functions.ex4
+
+namespace Functions.ex5
+def f : ∀ n : ℕ, ℕ := λ n, n + 1
+#check f
+end Functions.ex5
+
 
 /-
 Review of notations for declaring and defining functions (as lambda abstractions) in Lean.
