@@ -37,7 +37,8 @@ To start, write the Lean code using the axiom keyword
 needed to introduce the assumptions that "ItsRaining" 
 and "TheStreetsAreWet" are propositions. Write your
 answer just below this comment block and before the
-next one.
+next one. There are examples in the chapter that you
+can adapt to answer this question.
 -/
 
 -- Your answer here
