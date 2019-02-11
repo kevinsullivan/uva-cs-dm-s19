@@ -49,14 +49,13 @@ axioms (hj : Harry = Bob) (jb : Jose = Bob)
 example : Harry = Jose := _
 
 /-
-2. Use example to assert and then prove that
-if T is any type, and if a, b, c, and d, are
-values of that type, and if you have proofs of
-a = b, b = c, and c = d, you can construct a 
-proof of a = d. Put the proposition in the first
-placeholder below, and the proof in the second.
+2. Use example to assert and then prove that if
+a, b, c, and d are nats, and if you have proofs
+of a = b, b = c, and c = d, you can construct a
+proof of a = d. Put the proof in the placeholder
+below.
 
-Hint: Aquality propositions are types. Think of
+Hint: Equality propositions are types. Think of
 the problem here as one of producing a function
 of the specific type. Use lambdas. We've gotten
 you started. The first lambda "assumes" that a,
