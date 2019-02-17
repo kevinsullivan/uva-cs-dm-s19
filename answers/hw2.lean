@@ -133,28 +133,29 @@ your answers and not on how you developed them.
 
 -- 9. 
 def hw2_1: ℕ → ℕ :=
-    λ(x: ℕ), 
-        0 
+        λ n, n^5
 
 
 -- 10.
-def hw2_2: ℕ → ℕ → ℕ :=
-    λ n m, 0 
-
+def hw2_2: ℕ → (ℕ → ℕ) :=
+        λ n,
+                hw2_1
 
 -- 11.
 def hw2_3: (ℕ → ℕ) → (ℕ → ℕ) :=
-    λ f, f
-
+        λ f,
+                f
 
 -- 12.
 def hw2_4: (ℕ → ℕ) → ((ℕ → ℕ) → ℕ) :=
-    λ f, 
-        λ g, 0
+        λ f, λ g, 0
 
+#check hw2_4
+                        
 
 -- 13.
 def hw2_5: (ℕ → ℕ) → ((ℕ → ℕ) → (ℕ → ℕ)) :=
-    λ f, 
-        λ g, 
-            f
+        λ f : ℕ → ℕ, 
+                sorry  
+
+#check hw2_5
