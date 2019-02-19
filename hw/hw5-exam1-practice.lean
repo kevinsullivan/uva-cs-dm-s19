@@ -214,8 +214,8 @@ same as the entire set, D.
 
 Answer: 
 
-Answer: The property that the set of all 
-values appearing as the first element of 
+The property that the set of all 
+values appearing as the second element of 
 P is the same as the entire set, C. 
 
 Answer: 
