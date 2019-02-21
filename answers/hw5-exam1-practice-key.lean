@@ -454,7 +454,6 @@ is a Dog, then give a proof that in this
 world, Fido must be friendly, too.
 -/
 
-
 axioms Dog : Type
 axiom Fido : Dog
 axiom Friendly : Dog → Prop
