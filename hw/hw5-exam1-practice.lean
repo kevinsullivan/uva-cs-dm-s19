@@ -65,8 +65,15 @@ return types explicitly. Answer below.
 -/
 
 
+def square (n : ℕ) : ℕ := n^2
 
+def square' (n : ℕ) : ℕ := 
+begin
+exact n^2
+end
 
+def square'' : ℕ → ℕ :=
+λ n, n^2
 
 
 
@@ -88,6 +95,9 @@ you need to use parentheses to express
 how you want terms to be grouped. Answer
 below.
 -/
+
+lemma square_3_9 : eq (square 3) 9 := rfl
+
 
 
 
@@ -113,7 +123,11 @@ Answer below.
 -/
 
 
+def lastFirst (s1 s2 : string) : string :=
+    s2 ++ ", " ++ s1
 
+example : 
+    lastFirst "Orson" "Welles" = "Welles, Orson" := rfl
 
 /- 5.
 
@@ -129,9 +143,11 @@ returned must compute f(f(f(n))) when it
 is applied to an argument, n.
 -/
 
-def apply3 : _ :=
-    λ f : _, _
+def apply3 : (ℕ → ℕ) → (ℕ → ℕ) :=
+    λ f : ℕ → ℕ, 
+        λ n, f(f(f(n)))
 
+#reduce apply3 (λ n : ℕ, n^2) 2
 /- 6.
 
 The Lean libraries define a function,
@@ -150,7 +166,8 @@ cases to group terms correctly into
 larger terms.
 -/
 
-
+def len2 (s1 s2 : string) : ℕ :=
+    string.length (s1 ++ s2)
 
 /- 7.
 Use "example" to prove that there is a
@@ -160,6 +177,13 @@ function of the following type:
     ((ℕ → ℕ) → ℕ) →
         ((ℕ → ℕ) → ℕ)
 -/
+
+example : ((ℕ → ℕ) → (ℕ → ℕ)) →
+          ((ℕ → ℕ) → ℕ) →
+          ((ℕ → ℕ) → ℕ) :=
+λ f, 
+    λ g, 
+        g
 
 
 
@@ -283,6 +307,9 @@ Answer immediately after this comment block.
 If you need to introduce a name, use eqt1t2.
 -/
 
+axiom T : Type
+axioms t1 t2 : T
+axiom t1eqt2 :t1 = t2
 
 
 /- 12b.
@@ -296,7 +323,10 @@ additional assumptions that
 If you need to use a name, use Pt1
 -/
 
+axiom P : T → Prop
+axiom pf : P t1
 
+example : P t2 := eq.subst t1eqt2 pf
 
 /- 12 c.
 
@@ -425,4 +455,11 @@ Use Lean to model a world in which there
 are Dogs, all Dogs are friendly, and Fido
 is a Dog, with a proof that in this world,
 Fido must be friendly, too.
+-/
+
+
+/-
+Another
+
+Prove:  ∀(A B C: Prop), A ∧ (B ∧ C) →  (A ∧ B) ∧ C 
 -/
