@@ -28,19 +28,19 @@ the types involved in these definitions.
 def f (n : ℕ) (s : string) := s
 
 /-
-a. What is it's return type? Answer: 
+a. What is it's return type? Answer: string
 -/
 
 /-
-b. What is the type of (f 5)? Answer: 
+b. What is the type of (f 5)? Answer: string → string
 -/
 
 /-
-c. What is the value of (f 0 "yay")
+c. What is the value of (f 0 "yay") string
 -/
 
 /-
-d. What is the type of this function?
+d. What is the type of this function? nat → string → string
 -/
 
 
@@ -53,13 +53,13 @@ square of the value to which it is
 applied. Write the first function in 
 "C" style, the second using a tactic
 script, and the third using a lambda
-abstraction. Declare argumend and return
+abstraction. Declare argument and return
 types explicitly in each case.
 -/
 
 def square (n : ℕ) : ℕ := n^2
 
-def square' (n : ℕ) :=
+def square' (n : ℕ) : ℕ :=
 begin
 exact n^2
 end
@@ -125,8 +125,12 @@ given value, n, three times. That is, it
 returns a function that computes f(f(f(n))). 
 -/
 
-def apply3 : _ :=
-    λ f : _, _
+def apply3 : (ℕ → ℕ) → (ℕ → ℕ) :=
+    λ f : (ℕ → ℕ), 
+        λ n, f (f (f n))
+
+-- Just an extra sanity check, not required
+#reduce apply3 (λ n, n^2) 2
 
 /- 6.
 
@@ -253,17 +257,18 @@ is defined to be a function, *in Lean*, of
 type S → T. Which of the following properties,
 if any, does f necessarily have?
 
-- injective
-- surjective
-- bijective
-- one-to-many
-- one-to-one
-- onto
-- single-valued
-- partial
-- total
+- N: injective
+- N: surjective
+- N: bijective
+- N: one-to-many
+- N: one-to-one
+- N: onto
+- Y: single-valued
+- Y: partial (but not strictly partial)
+- Y: total 
 
-Answer: single valued, total
+Answer: single valued, total, partial (if we define partial functions
+to include total functions)
 
 -/
 
@@ -404,7 +409,7 @@ end
 The following problems involve implications.
 For example, false → P in an implication. To
 prove an implication, just show that there is
-(give) a function of the specified type.
+(by giving) a function of the specified type.
 -/
 
 -- lambda expression
@@ -445,12 +450,14 @@ end
 
 Use Lean to model a world in which there 
 are Dogs, all Dogs are friendly, and Fido
-is a Dog, with a proof that in this world,
-Fido must be friendly, too.
+is a Dog, then give a proof that in this 
+world, Fido must be friendly, too.
 -/
 
 axioms Dog : Type
 axiom Fido : Dog
 axiom Friendly : Dog → Prop
 axiom allFriendly : ∀ d : Dog, Friendly d
+
+-- proof is by application of forall elimination
 example : Friendly Fido := allFriendly Fido
