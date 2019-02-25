@@ -36,7 +36,7 @@ b. What is the type of (f 5)? Answer: string → string
 -/
 
 /-
-c. What is the value of (f 0 "yay") string
+c. What is the value of (f 0 "yay") "yay"
 -/
 
 /-
