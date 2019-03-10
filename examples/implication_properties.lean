@@ -81,8 +81,8 @@ end
 example: ¬(∀(A B C: Prop),
   ((A → B) → C) ↔ (A ∧ B → C)) :=
 begin
-  assume pf_not_forall,
-  have pf_with_false := pf_not_forall false false false,
+  assume pf_forall,
+  have pf_with_false := pf_forall false false false,
   have half_pf_with_false := (iff.elim_right pf_with_false),
   have pf_false_and_false_to_false: false ∧ false → false :=
     begin
@@ -111,9 +111,9 @@ end
 example: ¬∀(A B: Prop),
   (A → B) → (B → A) :=
 begin
-  assume pf_not_forall,
+  assume pf_forall,
   have pf_false_to_true_to_true_to_false :=
-    pf_not_forall false true,
+    pf_forall false true,
   have pf_false_to_true :=
     λ(f: false), true.intro,
   have pf_true_to_false :=
