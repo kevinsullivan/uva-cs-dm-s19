@@ -66,10 +66,15 @@ end
 -- classical logic
 axiom em: ∀(P: Prop), P ∨ ¬P
 
+example: ¬¬true :=
+begin
+  sorry
+end
+
 theorem double_neg_elim: ∀{P: Prop}, ¬¬P → P := 
 begin
   assume P : Prop,
-  assume pfNotNotP : ¬ ¬ P,
+  assume pfNotNotP : ¬¬P,
   cases (em P) with pf_P pf_not_P,
     show P, from pf_P,
 
