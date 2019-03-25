@@ -1,4 +1,9 @@
 /-
+Grading rubric. 7 points per question up to 100 max.
+Partial credit by subproblem.
+-/
+
+/-
 Note: An incorrect answer above or below
 a correct answer can cause Lean to be unable
 to process the correct answer. If you are not
@@ -17,7 +22,7 @@ to define, use, and reason about functions in
 Lean.
 -/
 
-/- 1.
+/- 1. 
 
 Study each of the following definitions,
 then answer the associated question about 
