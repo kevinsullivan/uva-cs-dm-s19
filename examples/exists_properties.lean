@@ -180,15 +180,57 @@ end
 example: ∃(P Q: Prop), 
   (P ∨ Q) ∧ (¬P ∨ ¬Q) ∧ (¬P ∨ Q) :=
 begin
+  apply exists.intro false,
+  apply exists.intro true,
+  split,
+    -- P ∨ Q
+    exact or.inr true.intro,
+    split,
+      -- ¬P ∨ ¬Q
+      have pf_not_false := λ(f: false), f,
+      exact or.inl pf_not_false,
+      -- ¬P ∨ Q
+      exact or.inr true.intro,
 end
 
 example: ¬(∃(P Q: Prop), 
   (P ∨ Q) ∧ (¬P ∨ ¬Q) ∧ (¬P ∨ Q) ∧ (¬Q)) :=
 begin
+  assume pf_exists,
+  apply exists.elim pf_exists,
+  assume P pw',
+  apply exists.elim pw',
+  assume Q pw,
+  have pf_not_q := pw.right.right.right,
+  have pf_not_p_or_q := pw.right.right.left,
+  cases pf_not_p_or_q with pf_not_p pf_q,
+    -- ¬P
+    have pf_p_or_q := pw.left,
+    cases pf_p_or_q with pf_p pf_q,
+      -- P
+      contradiction,
+      -- Q
+      contradiction,
+    -- Q
+    contradiction,
 end
 
 example: ∃(P Q R: Prop), 
   (P ∨ Q ∨ R) ∧ (¬P ∨ ¬Q ∨ ¬R) ∧
-    (¬P ∨ Q ∨ R) ∧ (¬Q ∨ ¬R) :=
+    (¬P ∨ Q ∨ R) ∧ (¬Q ∨ ¬R) := 
 begin
+  apply exists.intro false,
+  apply exists.intro true,
+  apply exists.intro false,
+  split,
+    -- P ∨ Q ∨ R
+    exact or.inr (or.inl true.intro),
+    split,
+      -- ¬P ∨ ¬Q ∨ ¬R
+      exact or.inl (λ(f: false), f),
+      split,
+        -- ¬P ∨ Q ∨ R
+        exact or.inr (or.inl true.intro),
+        -- ¬Q ∨ ¬R
+        exact or.inr (λ(f: false), f),
 end
