@@ -117,11 +117,9 @@ theorem reverseProperty'{P S: ℕ → Prop}:
 begin
   assume ex,
   apply exists.elim ex,
-  assume w,
-  assume Pw,
-  have pfWReverse: S w ∧ P w :=
-    and.intro Pw.right Pw.left,
-  exact ⟨w, pfWReverse⟩ 
+  assume w Pw,
+  apply exists.intro w,
+  exact and.intro Pw.right Pw.left,
 end
 
 theorem reverseProperty''{P S: ℕ → Prop}: 
@@ -177,6 +175,21 @@ begin
     contradiction,
 end
 
+example: ∃(P Q: Prop),
+  (P ∨ Q) ∧ (¬P ∨ ¬Q) :=
+begin
+  apply exists.intro true,
+  apply exists.intro false,
+  have pf_not_f := λ(f: false), f,
+  have pf_not_t_or_not_f :=
+    or.intro_right (¬true) pf_not_f,
+  have pf_t_or_f :=
+    or.intro_left false true.intro,
+  have pf_t_or_f' : true ∨ false :=
+    or.inl true.intro,
+  exact and.intro pf_t_or_f pf_not_t_or_not_f,
+end
+
 example: ∃(P Q: Prop), 
   (P ∨ Q) ∧ (¬P ∨ ¬Q) ∧ (¬P ∨ Q) :=
 begin
@@ -187,10 +200,12 @@ begin
     exact or.inr true.intro,
     split,
       -- ¬P ∨ ¬Q
-      have pf_not_false := λ(f: false), f,
-      exact or.inl pf_not_false,
+      apply or.inl,
+      assume f,
+      assumption,
       -- ¬P ∨ Q
-      exact or.inr true.intro,
+      apply or.inr,
+      exact true.intro,
 end
 
 example: ¬(∃(P Q: Prop), 
@@ -225,12 +240,76 @@ begin
   split,
     -- P ∨ Q ∨ R
     exact or.inr (or.inl true.intro),
+    have f := λ(f: false), f, 
     split,
       -- ¬P ∨ ¬Q ∨ ¬R
-      exact or.inl (λ(f: false), f),
+      exact or.inl f,
       split,
         -- ¬P ∨ Q ∨ R
-        exact or.inr (or.inl true.intro),
+        exact or.inl f,
         -- ¬Q ∨ ¬R
-        exact or.inr (λ(f: false), f),
+        exact or.inr f,
+end
+
+example: ∀(T: Type)(pred: T → Prop),
+  ¬(∃(t: T), pred t) ↔
+    ∀(t: T), ¬(pred t) :=
+begin
+  intros,
+  split,
+    -- forward
+    assume pf_notexists,
+    assume t,
+    assume pf_predt,
+    have pf_exists := exists.intro t pf_predt,
+    contradiction,
+    -- backward
+    assume pf_forall,
+    assume pf_exists,
+    apply exists.elim pf_exists,
+    assume w pw,
+    have pf_npredw := pf_forall w,
+    contradiction,
+end
+
+axiom em: ∀(P: Prop), P ∨ ¬P
+
+example: ∀(T: Type)(pred: T → Prop),
+  ¬(∀(t: T), pred t) ↔
+    ∃(t: T), ¬(pred t) :=
+begin
+  intros,
+  split,
+    -- forward
+    assume pf_notforall,
+    cases (em (∃ (t : T), ¬pred t)) with
+        pf_exists pf_notexists,
+      -- exists
+      assumption,
+      -- doesn't exist
+      have pf_forall_doubleneg: ∀(t: T), ¬¬(pred t) :=
+      begin
+        assume t,
+        assume pf_neg,
+        have pf_exists := exists.intro t pf_neg,
+        contradiction,
+      end,
+      have pf_forall: ∀(t: T), pred t :=
+      begin
+        assume t,
+        have pf_doubleneg := pf_forall_doubleneg t,
+        cases (em (pred t)) with pf_pred pf_npred,
+          -- pred t
+          assumption,
+          -- ¬pred t
+          contradiction,
+      end,
+     contradiction,
+    -- backward
+    assume pf_existsnot,
+    assume pf_forall,
+    apply exists.elim pf_existsnot,
+    assume w pw,
+    have pf_predw := pf_forall w,
+    contradiction,
 end
