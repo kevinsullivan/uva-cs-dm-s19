@@ -17,6 +17,12 @@ begin
     from nat.no_confusion h
 end
 
+#reduce nat.add_zero
+#check nat.zero
+#reduce nat.succ(nat.zero)
+#reduce nat.succ(nat.succ(nat.zero))
+#reduce nat.succ(4)
+
 theorem ttneqff : ¬tt = ff := 
 begin
     assume h : (tt = ff),
@@ -32,6 +38,15 @@ theorem proof_by_negation : ∀(P : Prop),
     (P → false) → ¬P :=
         λ P p, p
 
+theorem proof_by_negation' : ∀(P : Prop),
+    (P → false) → ¬P :=
+begin
+  assume P,
+  assume pf_P_to_f,
+  assume pf_P,
+  exact pf_P_to_f pf_P,
+end
+
 lemma zneqo''': ¬(0 = 1) :=
 begin
     apply proof_by_negation,
@@ -40,9 +55,18 @@ begin
     from (nat.no_confusion h)
 end
 
-theorem qAndNotQfalse{P Q: Prop}
+theorem qAndNotQfalse{Q: Prop}
   (pf: Q ∧ ¬Q): false := 
     pf.right pf.left
+
+example: ∀(Q: Prop), Q ∧ ¬Q → false :=
+begin
+  assume Q,
+  assume pf_Q_and_not_Q,
+  have pf_Q := pf_Q_and_not_Q.left,
+  have pf_not_Q := pf_Q_and_not_Q.right,
+  contradiction,
+end
 
 theorem no_contra : 
 ∀(Q: Prop), ¬(Q ∧ ¬Q) :=
@@ -51,7 +75,7 @@ theorem no_contra :
 
 theorem ncab{a b: nat}: ¬((a = b) ∧ (a ≠ b)) :=
 begin
-    apply no_contra
+    apply no_contra,
 end
 
 theorem ncab'{a b: nat}: ¬((a = b) ∧ (a ≠ b)) :=
@@ -68,7 +92,9 @@ axiom em: ∀(P: Prop), P ∨ ¬P
 
 example: ¬¬true :=
 begin
-  sorry
+  assume pf_not_true,
+  have pf_true := true.intro,
+  contradiction,
 end
 
 theorem double_neg_elim: ∀{P: Prop}, ¬¬P → P := 
@@ -150,7 +176,7 @@ begin
     assumption,
     -- ¬Q
     have pf_not_P := pf_not_Q_to_not_P pf_not_Q,
-    exact false.elim (pf_not_P pf_P)
+    contradiction,
 end
 
 theorem zeqz' : 0 = 0 → true :=
