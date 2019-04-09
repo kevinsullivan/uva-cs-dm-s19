@@ -29,17 +29,23 @@ begin
   assume pf_disj,
   cases pf_disj,
     -- 2 + 5 = 0
+    /-
     have pf_contra: 2 + 5 ≠ 0 :=
     begin
       apply nat.no_confusion,
     end,
     contradiction,
+    -/
+    cases pf_disj,
     -- 9 + 1 = 0
+    /-
     have pf_contra: 9 + 1 ≠ 0 :=
     begin
       apply nat.no_confusion,
     end,
     contradiction,
+    -/
+    cases pf_disj, 
 end
 
 /-
@@ -69,6 +75,18 @@ begin
         exact or.inr (or.inl pf_not_q),
       -- ¬P
       exact or.inl pf_not_p,
+      /-
+      Think about what we just proved and how we proved
+      it. The em principle allowed us to consider two cases
+      for each of P, Q, and R. In case any one of them is
+      false, the an ease "or introduction" will prove the
+      goal. In the case all of them are true, well, that
+      contradicts the assumption, and (using false elim)
+      we can ignore cases with contradictory assumptions
+      because they can't actually happen.
+      -/
+
+
     -- ¬P ∨ ¬Q ∨ ¬R → ¬(P ∧ Q ∧ R)
     assume pf_disj_not,
     assume pf_conj,
@@ -84,6 +102,14 @@ begin
         -- ¬R
         have pf_r := pf_conj.right.right,
         contradiction,
+
+    /-
+    In this case, we've assumed all of P, Q, and R
+    are true. In this context, the assumption that at
+    least one of them is false is contradictory. What
+    the proof script confirms is that this intuition 
+    can be proved formally.
+    -/
 end
 
 /-
@@ -102,27 +128,40 @@ begin
     split,
       -- ¬A
       assume pf_A,
+      /-
+      Here again the key insight is that from a proof
+      of just A we can construct proof of a contradiction
+      that directly contradicts an assumption, at which
+      point we have shown that this case can be dismissed
+      using false elimination (via the contradiction tactic).
+      -/
       have pf_disj: A ∨ B ∨ C :=
         or.inl pf_A,
       contradiction,
-      split,
+      split,        -- short for apply and.intro _ _,
         -- ¬B
         assume pf_B,
+        -- same trick 
         have pf_disj: A ∨ B ∨ C :=
           or.inr (or.inl pf_B),
         contradiction,
         -- ¬C
         assume pf_C,
+        -- same trick 
         have pf_disj: A ∨ B ∨ C :=
           or.inr (or.inr pf_C),
         contradiction,
+
     -- ¬A ∧ ¬B ∧ ¬C → ¬(A ∨ B ∨ C)
     assume pf_conj_not,
     assume pf_disj,
+    -- each one false + at least one true = contradiction
     cases pf_disj with pf_A pf_disj,
       -- A
+      -- basically same trick: expose direct contradition
       have pf_not_A := pf_conj_not.left,
       contradiction,
+      -- repeat until done
       cases pf_disj with pf_B pf_C,
         -- B
         have pf_not_B := pf_conj_not.right.left,
@@ -142,21 +181,31 @@ example: ∀(A B: Prop),
   ¬(A ∨ ¬B) ↔ (¬A ∧ B) :=
 begin
   assume X Y,
-  split,
+  split,        -- short for "apply IFF.intro _ _"
     -- ¬(X ∨ ¬Y) → ¬X ∧ Y
     assume pf_not_disj,
-    split,
+    split,      -- short for "apply AND.intro _ _"
       -- ¬X
       assume pf_X,
+      -- here's that same trick again
       have pf_disj: X ∨ ¬Y := or.inl pf_X,
       contradiction,
       -- Y
+      /-
+      Case analysis on (Y ∨ ¬ Y). Think about the two
+      cases before proceeding "blindly". In the case that
+      Y is true, then the goal is proved. What happens in
+      the case where Y is false? Yep: that's a contradiction,
+      which you can expose with the same trick we've seen
+      several times here already.
+      -/
       cases (em Y) with pf_Y pf_not_Y,
         -- Y,
         assumption,
         -- ¬Y
         have pf_disj: X ∨ ¬Y := or.inr pf_not_Y,
         contradiction,
+
     -- ¬X ∧ Y → ¬(X ∨ ¬Y)
     assume pf_not_X_and_Y,
     assume pf_X_or_not_Y,
@@ -182,19 +231,42 @@ begin
   split,
     -- ¬(A ∧ ¬B) → ¬A ∨ B
     assume pf_not_conj,
+    /-
+    At this point there's nothing we can do *unless*
+    we use excluded middle to consider only two cases,
+    one where we have a proof that A is true and one 
+    where we have a proof that it is not true. Then we
+    do the same kind of case analysis for B. In effect
+    we're *just looking at the truth table*. There are
+    four cases: A true, B true; A true, A false; B true,
+    A false; B false. Before proceeding, just think 
+    about what happens in each case. Write out the
+    truth table.
+    -/
     cases (em A) with pf_A pf_not_A,
       -- A
       cases (em B) with pf_B pf_not_B,
         -- B
         exact or.inr pf_B,
         -- ¬B
+        -- here's that trick again!
         have pf_conj: A ∧ ¬B := ⟨pf_A, pf_not_B⟩,
         contradiction,
       -- ¬A
       exact or.inl pf_not_A,
+
+
     -- ¬A ∨ B → ¬(A ∧ ¬B)
     assume pf_disj,
     assume pf_conj,
+    /-
+    Look at and *think about* what's in the context.
+    You must be able to reason logically at this point.
+    If ¬ A or B is true, it is true because at least one
+    of them is true. If ¬ A is true, that contradicts the
+    other assumption, that both A and ¬ B are true. If B
+    is true, on the other hand, that's also a contradiction.
+    -/
     cases pf_disj with pf_not_A pf_B,
       -- ¬A
       have pf_A := pf_conj.left,
@@ -220,6 +292,19 @@ begin
     assume pf_disj,
     assume pf_P,
     assume pf_Q,
+    /-
+    Beyond just mechanically applying tactics,
+    stop now and think about what you've got. As
+    a mathematician, you want to start to "look
+    ahead" to see "what will happen" if you try
+    different approaches. Here, for example, you
+    can see that if the disjunction is true because
+    ¬ P is true, that will immediately give you a
+    contradiction that you can use to be done with
+    that case. Think ahead about the other case.
+    Start to see beyond the current instant, to 
+    see what's coming if you take certain paths. 
+    -/
     cases pf_disj with pf_not_P pf_disj,
       -- ¬P
       contradiction,
@@ -228,14 +313,41 @@ begin
         contradiction,
         -- R
         assumption,
+
+
     -- (P → Q → R) → ¬P ∨ ¬Q ∨ R
     assume pf_impl,
+    /-
+    There's no way forward constructively.
+    But if we can assume that there are only
+    two possible cases for P, Q, and R, then
+    we can just consider each case in turn,
+    again using what amounts to the method
+    of "truth tables".
+    -/
     cases (em P) with pf_P pf_not_P,
       -- P
+      /-
+      Right here you use another absolutely (!!)
+      fundamental insight. If you have a proof
+      of an implication and you have a proof of
+      its premise you can derive a proof of its
+      conclusion. In constructive logic this is
+      done by "applying" the implication proof
+      (a function!) to the premise proof (a valid
+      argument).
+      -/
       have pf_Q_to_R := pf_impl pf_P,
       cases (em Q) with pf_Q pf_not_Q,
         -- Q
         have pf_R := pf_Q_to_R pf_Q,
+        /-
+        We have a proof of R and now only 
+        need to prove a disjunction in which
+        R is one of the disjunctions. You have
+        to understand the associativity of ∨.
+        It's right associative.
+        -/
         exact or.inr (or.inr pf_R),
         -- ¬Q
         exact or.inr (or.inl pf_not_Q),
@@ -254,6 +366,15 @@ begin
   assume P,
   assume pf_trip_neg,
   assume pf_P,
+  /-
+  How to proceed here is a little tricky. A key
+  insight is that you can apply em to whatever
+  proposition you want, to get a proof that is is
+  either true or a proof that it is false. Here,
+  applying em to ¬ P does the trick. Think ahead
+  to see if you can see why. Then *confirm* what
+  you see by going through the proof script.
+  -/
   cases (em ¬P) with pf_not_P pf_nn_P,
     -- ¬P
     contradiction, -- contradicts P
@@ -275,6 +396,21 @@ statements are not satisfiable.
 
 /-
 8a. (P ∨ Q) ∧ (¬P ∨ Q) ∧ (P ∨ ¬Q)
+-/
+
+/-
+Note: Problems that start with ∃ are basically
+search problems: you have to "searcg for, find,
+and then use a witness that makes the proposition
+true." In the worse case, use a truth table. That
+is the way to systematically consider all possible
+solutions. A problem with two "variables" will have
+only four cases to consider. You can of course try
+a value, and if you get stuck, "backtrack" (go back
+and change your choice then try going forward again).
+
+Also note that ∃(P Q: Prop), _ is short for
+∃( P : Prop), ∃ (Q : Prop), _.
 -/
 
 -- answer:
@@ -367,10 +503,10 @@ def isMult3(n: ℕ) := (∃(m: ℕ), m * 3 = n)
 example:
   ∃(n: ℕ), isEven n ∧ isMult3 n :=
 begin
-  have isEven6: isEven 6 := ⟨3, rfl⟩,
-  have isPrime6: isMult3 6 := ⟨2, rfl⟩,
+  have isEven6: isEven 6 := ⟨3, rfl⟩,   -- exists.intro
+  have isPrime6: isMult3 6 := ⟨2, rfl⟩, -- exists.intro
   have both := and.intro isEven6 isPrime6,
-  exact ⟨6, both⟩,
+  exact ⟨6, both⟩,                      -- exists.intro
 end
 
 /-
@@ -381,6 +517,12 @@ end
  at least as many parentheses as needed. (It's
  okay to use more than you need.)
 10b. Prove the above lemma.
+
+Note that this problem really requires that 
+you be able not only to prove but to write
+propositions involving several quantifiers,
+translating from English into the correct
+logical formalism.
 -/
 
 axioms Person Time: Type
