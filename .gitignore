@@ -1,14 +1,3 @@
 *.olean
 /_target
 /leanpkg.path
-
-*.doctree
-*.ltx
-*.raw
-*.inc
-
-# For students to put their work into
-/work
-
-# Office temporary files
-~$*

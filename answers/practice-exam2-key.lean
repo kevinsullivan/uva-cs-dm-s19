@@ -23,11 +23,11 @@ that 2 + 3 = 9.
 -/
 
 -- answer:
-example: 2 + 5 = 0 ∨ 9 + 1 = 0 → 2 + 3 = 9
+example: 2 + 5 = 3 ∨ 9 + 1 = 5 → 2 + 3 = 9
 :=
 begin
   assume pf_disj,
-  cases pf_disj,
+  cases pf_disj with left right,
     -- 2 + 5 = 0
     /-
     have pf_contra: 2 + 5 ≠ 0 :=
@@ -36,7 +36,7 @@ begin
     end,
     contradiction,
     -/
-    cases pf_disj,
+    cases left,
     -- 9 + 1 = 0
     /-
     have pf_contra: 9 + 1 ≠ 0 :=
@@ -45,7 +45,7 @@ begin
     end,
     contradiction,
     -/
-    cases pf_disj, 
+    cases right, 
 end
 
 /-
@@ -540,4 +540,5 @@ begin
   have pfCurIdiot := pf_witness t,
   exact ⟨witness, pfCurIdiot⟩,
 end
+
 
