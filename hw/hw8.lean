@@ -1,14 +1,13 @@
 import tactic.ring
 
 /-
-1. 
-
-We implemented a Boolean abstract data type,
-mybool. That exercise showed you how the bool
-type is implemented in Lean. For purposes of
-this assignment, please use the bool type
-that Lean provides instead of our mybool type. 
+0. For the preceding import to work, you need 
+to have downloaded and compiled Lean's math library,
+per the recent ungraded assignment. Please go ahead
+and do that now. You'll need it for one or two of 
+the problems below.
 -/
+
 
 /- 1a. 
 
@@ -23,10 +22,7 @@ for bool values, by the way) in your answer.
 -/
 
 def bool_implies : bool → bool → bool
-| _ tt := tt
-| ff _ := tt
-| _ _ := ff
-
+| _ := _
 
 /- 1b.
 Given your implementation of bool_implies,
@@ -38,22 +34,7 @@ analysis on Boolean values.
 example : ∀ b1 b2 : bool, 
     (bool_implies b1 b2 = tt) → (b2 = tt ∨ b1 = ff) :=
 begin
-intros b1 b2,
-induction b1,
-induction b2,
-assume h,
-apply or.inr,
-exact rfl,
-assume h,
-apply or.inl,
-exact rfl,
-induction b2,
-assume h,
-apply or.inr,
-cases h,
-assume h,
-apply or.inl,
-exact rfl,
+_
 end 
 
 /- 2a.
@@ -69,8 +50,7 @@ Hint: The second will take three arguments.
 -/
 
 inductive tree_nat : Type
-| empty : tree_nat
-| node : nat → tree_nat → tree_nat → tree_nat
+| 
 
 /- 2b.
 
@@ -80,13 +60,7 @@ and the second one a node containing the
 value 2 and two empty trees.
 -/
 
-def aTree := tree_nat.node 
-                3 
-                (tree_nat.empty) 
-                (tree_nat.node 
-                    2 
-                    tree_nat.empty
-                    tree_nat.empty)
+def aTree := _
 
 /- 3. Define a polymorphic type, "tree", 
 just like tree_nat, but where the value stored
@@ -99,25 +73,8 @@ aTree' except that 3 is replaced by "Hi!" and
 2 is replaced by "Jo".
 -/
 
-inductive tree { T : Type } : Type
-| empty : tree
-| node : T → tree → tree → tree
+-- Your answer here
 
-def aTree' : tree := tree.node
-                3 
-                (tree.empty) 
-                (tree.node 
-                    2 
-                    tree.empty
-                    tree.empty)
-
-def aTree'' : tree := tree.node
-                "Hi!" 
-                (tree.empty) 
-                (tree.node 
-                    "Jo" 
-                    tree.empty
-                    tree.empty)
 
 
 /- 4.
@@ -130,68 +87,105 @@ The number of nodes in an empty tree is zero,
 while the number of nodes in a non-empty 
 tree is one (for the "top" node) plus the 
 number of nodes in each of the subtrees.
+
+The "at sign" before "tree" in the following
+function signature tells Lean that even though
+tree takes its type argument implicitly, in 
+this case we want to give it explicitly. We
+need to specify T explicitly here because Lean
+has no way of knowing that's what we want.
 -/
 
 def num_nodes : ∀ {T : Type}, @tree T → nat
-| T tree.empty := 0
-| T (tree.node t c1 c2) := 
-    1 + num_nodes c1 + num_nodes c2
+| T tree.empty := _
 
 
 /- 
-Our mynat type is identical to the nat type
-provided by Lean's library of data types.
-For the following problems, used Lean's nat
-type rather than our mynat type.
+The following questions use our definition of
+the nas to practice proof by induction. Here is
+our nat type and the implementations of addition
+and multiplication.
 -/
 
-#print nat
+inductive mynat : Type
+| zero : mynat
+| succ : mynat → mynat
+
+def add_mynat: mynat → mynat → mynat
+| mynat.zero m := m
+| (mynat.succ n') m :=
+    mynat.succ (add_mynat n' m)
+
+def mult_mynat: mynat → mynat → mynat
+| mynat.zero m := mynat.zero
+| (mynat.succ n') m :=
+    add_mynat m (mult_mynat n' m) 
+
+
+/-
+Here's a proof that zero is a right identity
+for addition. We explain details in comments.
+You will want to use some of the same ideas in
+your proofs. 
+-/
+
+theorem zero_right_id_add : ∀ (n : mynat),
+    add_mynat n mynat.zero = n :=
+begin
+-- forall introduction
+intro n,
+-- induction
+induction n with n' ih,
+
+-- base case
+exact rfl,
+
+-- recursive case
+-- first simplify based on definition of add_mynat
+simp [add_mynat],
+-- now apply induction hypothesis
+exact ih,
+end
 
 /- #5
 
 Prove the following by induction on n in Lean.
 -/
 
--- 5a. Prove that zero is a right identity for mult.
+-- 5b. Prove that succ (n + m) = n + (succ m).
 
-example : ∀ (n : ℕ), 
-  n * 0 = 0 :=
+theorem add_succ : ∀ (n m : mynat), 
+    mynat.succ (add_mynat n m) = add_mynat n (mynat.succ m) :=
 begin
-intro n,
-induction n with n,
-exact rfl,
-exact rfl,
-end
-
--- 5b. Prove that addition is associative.
-
-example : 
-    ∀ (n m p : ℕ), 
-        (n + m) + p = n + (m + p) :=
-begin
-intros n m,
-induction n with n,
-simp,
-simp,
+_
 end
 
 
-example : ∀ (n m : ℕ), (n = m) :=
-begin
+-- 5a. Prove zero is a right identity for mult.
 
+theorem zero_right_absorb_mult : ∀ (n : mynat), 
+  mult_mynat n mynat.zero = mynat.zero :=
+begin
+_
 end
 
--- 5c. Prove that addition is commutative.
+-- 5b. Prove addition is associative.
 
-example :
-    ∀ (n m : ℕ), n + m = m + n :=
+theorem addition_assoc : 
+    ∀ (n m p : mynat), 
+        add_mynat (add_mynat n m) p = 
+        add_mynat n (add_mynat m p) :=
 begin
-    intros n m,
-    induction n,
-    simp,
-    simp,
+_
 end
 
+-- 5c. Prove addition is commutative.
+
+theorem addition_comm :
+    ∀ (n m : mynat), add_mynat n m = add_mynat m n :=
+begin
+_
+end
 
 /- 6a. 
 
@@ -226,26 +220,37 @@ proved more easily.
 
 lemma double_plus : ∀ (n : ℕ), double n = n + n :=
 begin
-intro n,
-induction n,
-exact rfl,
-simp [double],
-rw n_ih,
-ring,
+_
 end
+
+
+/- 6c.
+
+Translate your formal proof that double n = n + n into
+a concise natural language proof.
+
+Your answer here: 
+
+-/
 
 
 /- 7a. 
 
 Complete then test the following definition of
-a function that computes the n'th Fibonacci number given
-n as an argument.
+a function that computes the n'th Fibonacci 
+number when given n as an argument.
 -/
 def fib : ℕ → ℕ 
-| 0 := 0
-| 1 := 1
-| (nat.succ (nat.succ n')) := _
+| _ := _
 
 
 
+/- 7b.
 
+Implement the factorial function. You will need to 
+define the function for both its base and recursive
+cases.
+-/
+
+def fac : ℕ → ℕ
+| _ := _
