@@ -1,15 +1,4 @@
-import tactic.ring
-
-/-
-0. For the preceding import to work, you need 
-to have downloaded and compiled Lean's math library,
-per the recent ungraded assignment. Please go ahead
-and do that now. You'll need it for one or two of 
-the problems below.
--/
-
-
-/- 1a. 
+/- 1a. [10 points]
 
 Implement a function, bool_implies, that takes
 two bool values, b1 and b2 (not propositions),
@@ -19,6 +8,7 @@ algebra. To know what your function should do,
 write out the truth table for implication. You
 may  not use Lean's → operator (which does work
 for bool values, by the way) in your answer. 
+Define the function by cases.
 -/
 
 def bool_implies : bool → bool → bool
@@ -50,7 +40,7 @@ Hint: The second will take three arguments.
 -/
 
 inductive tree_nat : Type
-| 
+| _
 
 /- 2b.
 
@@ -64,13 +54,15 @@ def aTree := _
 
 /- 3. Define a polymorphic type, "tree", 
 just like tree_nat, but where the value stored
-in a node can be of any type, T. Then define 
-aTree' to be the same as aTree except that it's 
-now of type tree rather than of type tree_nat.
-Make the type argument implicit. Finally
-define a tree of strings, aTree'', just like
-aTree' except that 3 is replaced by "Hi!" and
-2 is replaced by "Jo".
+in a node can be of any type, T. Hint: make the
+type of elements a parameter. You can look at the
+myprod type for an example. Then define aTree' 
+to be the same as aTree except that it's now 
+of type tree rather than of type tree_nat. Make 
+the type argument implicit. Finally define a
+tree of strings, aTree'', just like aTree' 
+except that 3 is replaced by "Hi!" and 2 is
+replaced by "Jo".
 -/
 
 -- Your answer here
@@ -93,17 +85,18 @@ function signature tells Lean that even though
 tree takes its type argument implicitly, in 
 this case we want to give it explicitly. We
 need to specify T explicitly here because Lean
-has no way of knowing that's what we want.
+has no way of knowing that we want the type of
+elements to be T. 
 -/
 
 def num_nodes : ∀ {T : Type}, @tree T → nat
 | T tree.empty := _
 
 
-/- 
+/-
 The following questions use our definition of
-the nas to practice proof by induction. Here is
-our nat type and the implementations of addition
+mynat to practice proof by induction. Here is
+our mynat type and the implementations of addition
 and multiplication.
 -/
 
@@ -176,7 +169,11 @@ theorem addition_assoc :
         add_mynat (add_mynat n m) p = 
         add_mynat n (add_mynat m p) :=
 begin
-_
+intros n m p,
+induction n,
+exact rfl,
+simp [add_mynat],
+assumption,
 end
 
 -- 5c. Prove addition is commutative.
@@ -189,53 +186,6 @@ end
 
 /- 6a. 
 
-The next problem refers to the following
-recursive function. It takes a natural number
-as an argument and returns the natural number
-that is double the value of the argument. 
-Start by being sure you see how it works.
--/
-def double : ℕ → ℕ 
-| nat.zero := nat.zero
-| (nat.succ n') := nat.succ (nat.succ (double n'))
-
-#eval double 5  -- it works
-
-/- 6b.
-
-Prove the following simple proposition about
-this function. (Ack. To B. Pierce for this
-problem.) 
-
-Important hints: (1) the tactic, "simp [double]"
-will simplify an expression using the rules in
-the definition of the double function; (2) the
-"ring" tactic can find proofs for certain easy
-arithmetic propositions that require reasoning
-about associativity, commutativity, etc.; (3) it
-is often useful to use an induction hypothesis 
-*rewrite* a goal into a form that can then be
-proved more easily.
--/
-
-lemma double_plus : ∀ (n : ℕ), double n = n + n :=
-begin
-_
-end
-
-
-/- 6c.
-
-Translate your formal proof that double n = n + n into
-a concise natural language proof.
-
-Your answer here: 
-
--/
-
-
-/- 7a. 
-
 Complete then test the following definition of
 a function that computes the n'th Fibonacci 
 number when given n as an argument.
@@ -245,7 +195,7 @@ def fib : ℕ → ℕ
 
 
 
-/- 7b.
+/- 6b.
 
 Implement the factorial function. You will need to 
 define the function for both its base and recursive
@@ -254,3 +204,12 @@ cases.
 
 def fac : ℕ → ℕ
 | _ := _
+
+
+/- 7.
+
+Give an *informal* proof by induction of the proposition
+that forall natural numbers, n, the sum of the natural 
+numbers from 0 to n is n * (n + 1) / 2.
+
+-/
