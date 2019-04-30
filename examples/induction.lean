@@ -100,6 +100,10 @@ match s with
 | Off := On
 end
 
+def toggle': switch → switch
+  | On := Off
+  | Off := On
+
 example : ∀ s : switch, toggle (toggle s) = s :=
 begin
   intro s,
@@ -174,12 +178,11 @@ begin
 end
 
 
-
 -- Let's test it  out
-def p1 := myprod.mk 1 2
-def p2 := myprod.mk 1 tt
-#check p1
+def p2 := myprod.mk 1 2
+def p3 := myprod.mk 1 tt
 #check p2
+#check p3
 #eval fst' nat nat (myprod.mk 1 1)
 #eval fst (myprod.mk 1 1)
 #eval snd' string bool (myprod.mk "Hello" tt)
@@ -219,16 +222,90 @@ BOOLEAN
         | _ _ := fff
 
     def or_mybool (b1 b2 : mybool) : mybool :=
-    _       -- exercise
+      match b1, b2 with
+        | fff, fff := fff
+        | _, _ := ttt
+      end
 
     def implies_mybool (b1 b2 : mybool) : mybool :=
-    _       -- exercise
+      match b1, b2 with
+        | ttt, fff := fff
+        | _, _ := ttt
+      end
 
-    def or_mybool (b1 b2 : mybool) : mybool :=
-    _       -- exercise
+    example: ∀(b1 b2: mybool),
+      (implies_mybool b1 b2) = (or_mybool (not_mybool b1) b2) :=
+    begin
+      intros b1 b2,
+      induction b1,
+        induction b2,
+          -- ttt ttt
+          unfold implies_mybool,
+          unfold not_mybool,
+          unfold or_mybool,
+          -- ttt fff
+          unfold implies_mybool,
+          unfold not_mybool,
+          unfold or_mybool,
+        -- fff _
+        unfold implies_mybool,
+        unfold not_mybool,
+        unfold or_mybool,
+    end
 
-    def implies_mybool (b1 b2 : mybool) : mybool :=
-    _       -- exercise
+    def xor_mybool (b1 b2 : mybool) : mybool :=
+      match b1, b2 with
+        | ttt, fff := ttt
+        | fff, ttt := ttt
+        | _, _ := fff
+      end
+
+    -- For booleans, xnor is equality - why?
+    def xnor_mybool (b1 b2 : mybool) : mybool :=
+      match b1, b2 with
+        | ttt, ttt := ttt
+        | fff, fff := ttt
+        | _, _ := fff
+      end
+    
+    def eq_mybool (b1 b2 : mybool) : mybool :=
+      match b1, b2 with
+        | ttt, ttt := ttt
+        | fff, fff := ttt
+        | _, _ := fff
+      end
+
+    example: ∀(b1 b2: mybool),
+      (xnor_mybool b1 b2) = (xor_mybool b1 (not_mybool b2)) :=
+    begin
+      intros,
+      induction b1,
+        induction b2,
+          -- ttt ttt
+          unfold xnor_mybool,
+          unfold not_mybool,
+          unfold xor_mybool,
+          -- ttt fff
+          unfold xnor_mybool,
+          unfold not_mybool,
+          unfold xor_mybool,
+        induction b2,
+          -- fff ttt
+          unfold xnor_mybool,
+          unfold not_mybool,
+          unfold xor_mybool,
+          -- fff fff
+          unfold xnor_mybool,
+          unfold not_mybool,
+          unfold xor_mybool,
+    end
+
+    lemma xnor_is_eq: ∀(b1 b2: mybool),
+      (xnor_mybool b1 b2) = (eq_mybool b1 b2) :=
+    begin
+      intros,
+      exact rfl,
+    end
 
     theorem and_mybool_comm : 
         ∀ b1 b2 : mybool, and_mybool b1 b2 = and_mybool b2 b1 :=
@@ -433,3 +510,121 @@ begin
   exact true.intro,
   exact true.intro,
 end
+
+namespace ll_ns
+
+  inductive list : Type
+    | empty : list
+    | node : ℕ → list → list
+
+  #reduce list.empty
+  def list_9 := list.node 9 list.empty
+  def list_5_9 := list.node 5 list_9
+  def list_1_5_9 := list.node 1 list_5_9
+  def list_4_1_5_9 := list.node 4 list_1_5_9
+  def list_1_4_1_5_9 := list.node 1 list_4_1_5_9
+  def list_pi := list.node 3 list_1_4_1_5_9
+  #reduce list_pi
+
+  def count: list → ℕ
+    | list.empty := 0
+    | (list.node _ next) := 1 + (count next)
+
+  #reduce count list_pi
+
+  -- Not really recursive!
+  def count'(ll: list): ℕ :=
+    match ll with
+      | list.empty := 0
+      | (list.node _ next) := 1 + (count next)
+    end
+
+  #reduce count' list_pi
+
+  def last: list → ℕ
+    | list.empty := 0  -- because we need a total function
+    | (list.node val list.empty) := val
+    | (list.node _ rem) := last rem
+
+  #reduce last list_pi
+
+  def sum: list → ℕ
+    | list.empty := 0
+    | (list.node val next) := val + (sum next)
+  
+  #reduce sum list_pi
+
+  -- Returns a list devoid of its last node
+  -- E.g., (head (list.node 5 (list.node 9 list.empty))) returns
+  --         (list.node 5 list.empty)
+  def head: list → list
+    | list.empty := list.empty
+    | (list.node _ list.empty) := list.empty
+    | (list.node val rem) := (list.node val (head rem))
+
+  #reduce head list_pi
+
+  -- Lemma that adding an element to a list and then
+  -- taking the head is the same as taking the head and
+  -- then adding an element (unless the list is empty)
+  lemma head_commutes_with_listnode:
+    ∀(mylist: list)(val: ℕ),
+      (mylist = list.empty) ∨
+        (head (list.node val mylist)) =
+           (list.node val (head mylist)) :=
+  begin
+    intros,
+    induction mylist with val' mylist',
+      -- base case
+      apply or.inl,
+      exact rfl,
+      -- inductive case
+      apply or.inr,
+      cases mylist_ih,
+        -- empty
+        simp [head],
+        -- non-empty
+        simp [head],
+  end
+
+  lemma head_shortens_nonempty_list:
+    ∀(mylist: list), (mylist = list.empty) ∨ 
+      (count (head mylist)) = (count mylist) - 1 :=
+  begin
+    assume mylist,
+    induction mylist with val mylist casen,
+      -- base case
+      apply or.inl,
+      exact rfl,
+      -- inductive case
+      apply or.inr,
+      cases casen,
+        -- empty case
+        rw casen,
+        simp [head],
+        simp [count],
+        -- nonempty case
+        simp [count],
+        induction mylist with val' mylist casen',
+          -- base case
+          simp[head],
+          -- inductive case
+          have newfact := head_commutes_with_listnode (list.node val' mylist) val,
+          cases newfact with impossibly_empty commutes,
+            -- impossibly empty
+            trivial,
+            -- non-empty
+            sorry
+  end
+
+  -- Returns a reversed list
+  -- A reversed list is a list that starts with the last node
+  -- in the original list and is followed by the reverse list
+  -- of the head of the original list
+--  def reverse: list → list
+--    | list.empty := list.empty
+--    | nonempty_list := (list.node 
+--                          (last nonempty_list)
+--                          (reverse (head nonempty_list)))
+
+end ll_ns
