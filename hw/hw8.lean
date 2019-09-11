@@ -208,7 +208,7 @@ def fac : ℕ → ℕ
 
 /- 7.
 
-Give an *informal* proof by induction of the proposition
+Give an *informal proof by induction of the proposition
 that forall natural numbers, n, the sum of the natural 
 numbers from 0 to n is n * (n + 1) / 2.
 
